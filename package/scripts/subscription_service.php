@@ -32,12 +32,6 @@
 
         /**
          * @type(string)
-         * @title("Company authorization token")
-         */
-        public $company_token;
-
-        /**
-         * @type(string)
          * @title("Login to MyWeatherDemo interface")
          */
         public $username;
@@ -47,18 +41,11 @@
          * @title("Password for MyWeatherDemo user")
          */
         public $password;
-        
-        /**
-         * @type(string)
-         * @title("Company Name")
-         */
-        public $company_name;
 
         const BASE_URL = "http://www.myweatherdemo.com/api/company/";
         
         public function provision(){
             
-            // to create a company in external service we need to pass country, city and name of the company
             $request = array(
                     'country' => $this->account->addressPostal->countryName,
                     'city' => $this->account->addressPostal->locality,
@@ -67,12 +54,9 @@
             
             $response = $this->send_curl_request('POST', self::BASE_URL, $request);
 
-            // need to save UID in APSC to delete/get properties of the company in external service
             $this->company_id = $response->{'id'};
-            $this->company_token = $response->{'token'};
             $this->username = $response->{'username'};
             $this->password = $response->{'password'};
-            $this->company_name = $response->{'name'};
         }
 
         public function unprovision(){
@@ -86,22 +70,23 @@
         * @verb(GET)
         * @path("/getTemperature")
         */
-
         public function getTemperature(){
 
+            // to get current temperature we need to send GET request providing company_id
             $url = self::BASE_URL . $this->company_id;
             $response = $this->send_curl_request('GET', $url);
 
+            // returning both fahrenheit and celsuis to the caller, in our case - company.js
             $temperature = array();
             $temperature['fahrenheit'] = $response->{'fahrenheit'};
-            $temperature['celsius'] = $response->{'celcius'};
-
-            return $temperature;
+            $temperature['celsius'] = $response->{'celsius'};
+ 
+            // APS PHP runtime will automatically execute json_encode for $temperature
+            return $temperature; 
+            
         }
 
         private function send_curl_request($verb, $url, $payload = ''){
-
-            $logger = \APS\LoggerRegistry::get();
 
             $token = $this->application->provider_token;
 
@@ -121,7 +106,6 @@
             ));
             
             $response = json_decode(curl_exec($ch));
-            $logger->debug("Response was: " . print_r($response, true));
             
             curl_close($ch);
 
