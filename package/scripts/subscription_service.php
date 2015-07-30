@@ -1,6 +1,5 @@
 <?php
 
-    define('APS_DEVELOPMENT_MODE', true);
     require "aps/2/runtime.php";    
 
     /**
