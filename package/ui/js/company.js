@@ -6,7 +6,7 @@ require([
 ], function(at, xhr, load) {
 
     // calling custom operation getTemperature() defined in subscription_service
-    xhr.get("/aps/2/resources/" + aps.context.vars.subscription_service.aps.id + "/getTemperature").
+    xhr.get("/aps/2/resources/" + aps.context.vars.company.aps.id + "/getTemperature").
     // storing returned json in 'temperature'
     then(function(temperature){
 
@@ -18,8 +18,8 @@ require([
                     city: at(aps.context.vars.account.addressPostal, "locality"),
                     celsius: at(temperature, "celsius"),
                     fahrenheit: at(temperature, "fahrenheit"),
-                    username: at(aps.context.vars.subscription_service, "username"),
-                    password: at(aps.context.vars.subscription_service, "password")
+                    username: at(aps.context.vars.company, "username"),
+                    password: at(aps.context.vars.company, "password")
                 }]
             ]]);
         load(widgets);
